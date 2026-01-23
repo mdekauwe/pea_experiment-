@@ -19,7 +19,7 @@ n_measured <- 6
 
 mu <- 10                   # photosynthetic rate, umol m-2 s-1
 
-# define effect sizes, differently for the experiments
+# define effect sizes
 effect_drought <- 0.15 * mu       # 15% reduction
 effect_heat <- 0.20 * mu          # 20% reduction
 effect_drought_heat <- 0.25 * mu  # 25% reduction
@@ -27,15 +27,13 @@ effect_drought_heat <- 0.25 * mu  # 25% reduction
 sd_run <- 0.8        # between run variability, umol m-2 s-1
 sd_chamber <- 0.5    # between chamber variability, umol m-2 s-1
 sd_plant <- 2.0      # between plant variability, umol m-2 s-1
-sd_resid <- 1.5      # remaining noise, umol m-2 s-1
+sd_resid <- 1.5      # residual noise, umol m-2 s-1
 
 treatments <- c("control", "drought", "heat", "heat_drought")
 
-
 #
-## generate all our plants...
+## Generate all plants (fully crossed design)
 #
-
 plants <- expand.grid(
   run = 1:n_runs,
   chamber = 1:n_chambers,
@@ -43,41 +41,34 @@ plants <- expand.grid(
   plant = 1:n_plants
 )
 
-# make a readable plant ID
+# Make a readable plant ID
 plants$plant_id <- with(plants, 
-                      paste0("r", run, "_c", chamber, "_", treat, "_p", plant))
-
+                        paste0("r", run, "_c", chamber, "_", treat, "_p", plant))
 
 #
-## Sub-sample measured plants - 6 plants per treatment per run x chamber
+## Sub-sample measured plants - 6 plants per run × chamber × treatment
 #
 
-# split the plant table by run x chamber x treatment
-plant_groups <- split(plants, list(plants$run, plants$chamber, plants$treat),
+# Split the plant table by run × chamber × treatment
+plant_groups <- split(plants, list(plants$run, plants$chamber, plants$treat), 
                       drop = TRUE)
 
-# create an empty list to store results
+# Create an empty list to store sampled plants
 sampled_groups <- vector("list", length(plant_groups))
 names(sampled_groups) <- names(plant_groups)
 
-# randomly select n_measured plants per group
+# Randomly select n_measured plants per group
 for (i in seq_along(plant_groups)) {
   df <- plant_groups[[i]]  
   selected_rows <- sample(nrow(df), n_measured)
   sampled_groups[[i]] <- df[selected_rows, ]
 }
+
 measured_plants <- do.call(rbind, sampled_groups)
 
-# Add column of measured plants back to the overall experimental design
-plants$measured <- plants$plant_id %in% measured_plants$plant_id
-
-write.csv(plants, file = "plants_design.csv", row.names = FALSE)
-
-
-# check this is correct
-# 24 groups × 6 plants = 144 rows
-# 3 runs x 2 chambers x 4 treatments x 6 plants = 144 rows
-nrow(measured_plants)
+# Check number of sampled plants
+# should be 3 runs * 2 chambers * 4 treatments * 6 plants = 144
+nrow(measured_plants)  
 
 #
 ## Expand across weeks
@@ -121,23 +112,14 @@ drought_effect <- -effect_drought * design$drought
 heat_effect <- -effect_heat * design$temp
 
 # interaction effect (drought x heat)
-interaction_effect <- -0.5 * effect_drought_heat * design$drought * design$temp
-
-# combine everything to get the "expected mean" (fixed part) for each plant
-#design$mu <- baseline + drought_effect + heat_effect + interaction_effect
-
-#design$mu <- baseline +
-#  ifelse(design$week > 1,
-#         drought_effect + heat_effect + interaction_effect,
-#         0)
+interaction_effect <- -effect_drought_heat * design$drought * design$temp
 
 # treatment applies only in the last 3 weeks
 stress_weeks <- 6:8
 
 design$mu <- baseline +
   ifelse(design$week %in% stress_weeks,
-         drought_effect + heat_effect + interaction_effect,
-         0)
+         drought_effect + heat_effect + interaction_effect, 0)
 
 
 
@@ -179,7 +161,7 @@ summary(m)
 # drought:temp interactions = 0.63
 # drought:week, effect of drought over changing weeks = -0.29
 # temp:week, effect of heat over changing weeks= -0.44
-# drought:temp:week, three way interaction = -0.11
+# drought:temp:week, three way interaction = -0.34
 
 
 #
@@ -217,11 +199,11 @@ powerSim(m, test = fixed("drought:temp", "t"), nsim = 200)
 # more than 80% is enough
 
 powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
-# Result? we would detect an effect of heat 4100% of the time, 
+# Result? we would detect an effect of heat 100% of the time, 
 #more than 80% is enough
 
 powerSim(m, test = fixed("drought:temp:week", "t"), nsim = 200)
-# Result? we would detect an effect of drought x heat 24% of the time, 
+# Result? we would detect an effect of drought x heat 98% of the time, 
 # more than 80% is enough
 
 
