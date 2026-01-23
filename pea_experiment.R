@@ -79,12 +79,12 @@ plants$measured <- ifelse(plants$plant_id %in% measured_plants$plant_id, TRUE,
                           FALSE)
 
 plants <- plants %>%
-  arrange(run, chamber, treat, plant) %>%
+  arrange(run, chamber, treat, plant) %>% # just clean up the order
   group_by(run, chamber, treat) %>%
-  mutate(tray = ceiling(plant / 6)) %>%  # tray 1-6 within each treatment
-  ungroup() %>%
-  mutate(measured = plant_id %in% measured_plants$plant_id) %>%
-  select(run, chamber, treat, plant, tray, plant_id, measured, everything())
+  mutate(tray = ceiling(plant / 6)) %>%  # create a new column: tray = 1-6 within each treatment
+  ungroup() %>% # remove the grouping
+  mutate(measured = plant_id %in% measured_plants$plant_id) %>% # add the measured column
+  select(run, chamber, treat, plant, tray, plant_id, measured, everything()) # reorder the cols
 
 write.csv(plants, "full_experiment_grid.csv", row.names = FALSE)
 
