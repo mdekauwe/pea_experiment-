@@ -174,24 +174,23 @@ summary_df <- design %>%
   summarise(mean_Anet = mean(Anet), se_Anet = sd(Anet) / sqrt(n()), 
             .groups = "drop")
 
-ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, group = treat)) +
-  geom_line(size = 1) +                          
-  geom_point(size = 2) +                         
-  geom_ribbon(aes(ymin = mean_Anet - se_Anet, 
+p <- ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, group = treat)) +
+      geom_line(size = 1) +                          
+      geom_point(size = 2) +                         
+    geom_ribbon(aes(ymin = mean_Anet - se_Anet, 
                   ymax = mean_Anet + se_Anet, 
                   fill = treat), alpha = 0.2, color = NA) +       
-  labs(
-    x = "Week",
-    y = expression(paste("Anet (", mu, "mol ", m^-2, s^-1, ")")),
-    color = "Treatment",
-    fill = "Treatment"
-  ) +
-  theme_minimal(base_size = 14) +
-  theme(
-    legend.position = "top",
-    panel.grid.minor = element_blank()
-  )
-ggsave(filename = "Anet_experiment.png", plot = p, width = 8, height = 6, dpi = 300)
+    labs(
+      x = "Week",
+      y = expression(paste("Anet (", mu, "mol ", m^-2, s^-1, ")")),
+      color = "Treatment",
+      fill = "Treatment") +
+    theme_minimal(base_size = 14) +
+    theme(
+      legend.position = "top",
+      panel.grid.minor = element_blank())
+ggsave(filename = "Anet_experiment.png", plot = p, width = 8, height = 6, 
+       dpi = 300)
 
 #
 ## Power analysis
