@@ -168,15 +168,15 @@ design$Anet <- (design$mu + design$rand_eff_run + design$rand_eff_chamber +
 
 
 # week is a numeric, so we have a linear effect across week
-m <- lmer(Anet ~ drought * temp * week + (1 | run) + (1 | run:chamber) + 
-            (1 | plant_id), data=design)
+#m <- lmer(Anet ~ drought * temp * week + (1 | run) + (1 | run:chamber) + 
+#            (1 | plant_id), data=design)
 
 # we could treat week as a categorical, each week would be independent 
 #m <- lmer(Anet ~ drought * temp * factor(week) + 
 #            (1 | run) + (1 | run:chamber) + (1 | plant_id), 
 #         data = design)
 
-summary(m)
+#summary(m)
 
 # this simulates a baseline anet of 9.23
 # drought = 0.19
@@ -187,15 +187,15 @@ summary(m)
 # temp:week, effect of heat over changing weeks= -0.37
 # drought:temp:week, three way interaction = 0.24
 
-# experimental unit is different for heat though...
-chamber_means <- design %>%
-  group_by(run, chamber, temp, week) %>%
-  summarise(Anet = mean(Anet), .groups = "drop")
-
-m_chamber <- lmer(Anet ~ temp * week + (1 | run), data = chamber_means)
-summary(m_chamber)
 
 
+
+m_split <- lmer(Anet ~ drought * temp * week +
+                  (1 | run/chamber) +         # whole-plot error for heat
+                  (1 | run:chamber:plant_id), # sub-plot error for drought
+                data = design)
+
+summary(m_split)
 
 
 #
@@ -234,14 +234,27 @@ print(p)
 # weeks as a numeric
 # the model estimates one slope for week
 
-powerSim(m, test = fixed("drought:week", "t"), nsim = 200)
+#powerSim(m, test = fixed("drought:week", "t"), nsim = 200)
 #Result? we would detect an effect of drought x heat 99% of the time, 
 
-powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
+#powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
 #Result? we would detect an effect of heat 100% of the time, 
 
-powerSim(m, test = fixed("drought:temp:week", "t"), nsim = 200)
+#powerSim(m, test = fixed("drought:temp:week", "t"), nsim = 200)
 #Result? we would detect an effect of drought x heat 98% of the time, 
+
+# Number of experimental units per factor:
+# - drought: number of plants per chamber/run
+m_split <- extend(m_split, along = "plant_id", n = length(unique(design$plant_id)))
+powerSim(m_split, test = fixed("drought:week", "t"), nsim = 200)
+
+# - heat: number of chambers per run
+chamber_means <- design %>%
+  group_by(run, chamber, temp, week) %>%
+  summarise(Anet = mean(Anet), .groups = "drop")
+
+m_chamber <- lmer(Anet ~ temp * week + (1 | run), data = chamber_means)
+powerSim(m_chamber, test = fixed("temp:week", "t"), nsim = 200)
 
 ###
 # weeks as a factor...
