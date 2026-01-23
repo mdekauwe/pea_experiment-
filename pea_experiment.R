@@ -34,8 +34,6 @@ sd_resid <- 1.5      # residual noise, umol m-2 s-1
 
 ############################################################################## 
 
-
-
 treatments <- c("control", "drought", "heat", "heat_drought")
 
 #
@@ -127,13 +125,13 @@ names(rand_eff_plant) <- unique(design$plant_id)
 
 baseline <- mu  # 10 umol m-2 s-1
 
-# drought effect only for drought alone
+# drought effect only 
 drought_effect <- ifelse(design$treat == "drought", -effect_drought, 0)
 
-# heat effect only for heat alone
+# heat effect only 
 heat_effect <- ifelse(design$treat == "heat", -effect_heat, 0)
 
-# interaction effect only for combined stress
+# interaction effect 
 interaction_effect <- ifelse(design$treat == "heat_drought", -effect_drought_heat, 0)
 
 # treatment applies only in the last N weeks
