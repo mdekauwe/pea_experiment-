@@ -178,16 +178,6 @@ design$Anet <- (design$mu + design$rand_eff_run + design$rand_eff_chamber +
 
 #summary(m)
 
-# this simulates a baseline anet of 9.23
-# drought = 0.19
-# temp = 0.95
-# week = 0.05
-# drought:temp interactions = -0.28
-# drought:week, effect of drought over changing weeks = -0.24
-# temp:week, effect of heat over changing weeks= -0.37
-# drought:temp:week, three way interaction = 0.24
-
-
 
 # capture hierarchical structure of the split-plot experiment
 m_split <- lmer(Anet ~ drought * temp * week +
