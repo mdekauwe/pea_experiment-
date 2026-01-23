@@ -121,9 +121,6 @@ design$mu <- baseline + ifelse(design$week %in% stress_weeks,
                                drought_effect + heat_effect + interaction_effect, 
                                0)
 
-
-
-
 #
 ## random effects
 #
@@ -149,9 +146,10 @@ design$resid <- rnorm(nrow(design), 0, sd_resid)
 design$Anet <- (design$mu + design$rand_eff_run + design$rand_eff_chamber + 
                 design$rand_eff_plant + design$resid)
 
+m <- lmer(Anet ~ drought * temp * factor(week) + 
+            (1 | run) + (1 | run:chamber) + (1 | plant_id), 
+          data = design)
 
-m <- lmer(Anet ~ drought * temp * week + (1 | run) + (1 | run:chamber) + 
-            (1 | plant_id), data=design)
 summary(m)
 
 # this simulates a baseline anet of 9.23
