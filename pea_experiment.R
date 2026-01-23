@@ -2,7 +2,7 @@ library(lme4)
 library(simr)
 library(ggplot2)
 library(dplyr)
-
+library(lmerTest)
 set.seed(123)
 
 rm(list = ls())
@@ -207,6 +207,13 @@ summary(m_split)
 # combined impact of drought and heat on Anet over time differed from the 
 # sum of their individual effects. 
 
+
+m_split <- lmer(Anet ~ drought * temp * week +
+                  (1 | run/chamber) +
+                  (1 | run:chamber:plant_id),
+                data = design)
+
+summary(m_split)
 
 ## Plot the experiment
 #
