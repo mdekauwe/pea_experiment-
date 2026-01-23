@@ -7,6 +7,7 @@ set.seed(123)
 
 rm(list = ls())
 
+################################## Mess with this
 #
 ## Parameters
 #
@@ -30,6 +31,10 @@ sd_run <- 0.8        # between run variability, umol m-2 s-1
 sd_chamber <- 0.5    # between chamber variability, umol m-2 s-1
 sd_plant <- 2.0      # between plant variability, umol m-2 s-1
 sd_resid <- 1.5      # residual noise, umol m-2 s-1
+
+################################## 
+
+
 
 treatments <- c("control", "drought", "heat", "heat_drought")
 
