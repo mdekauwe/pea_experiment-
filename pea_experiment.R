@@ -34,7 +34,7 @@ sd_resid <- 1.5      # residual noise, umol m-2 s-1
 treatments <- c("control", "drought", "heat", "heat_drought")
 
 #
-## Generate all plants (fully crossed design)
+## Generate all plants 
 #
 plants <- expand.grid(
   run = 1:n_runs,
@@ -48,7 +48,7 @@ plants$plant_id <- with(plants,
                         paste0("r", run, "_c", chamber, "_", treat, "_p", plant))
 
 #
-## Sub-sample measured plants - 6 plants per run × chamber × treatment
+## Sub-sample measured plants - N plants per run × chamber × treatment
 #
 
 # Split the plant table by run × chamber × treatment
@@ -72,13 +72,15 @@ measured_plants <- do.call(rbind, sampled_groups)
 # should be 3 runs * 2 chambers * 4 treatments * 6 plants = 144
 nrow(measured_plants)  
 
+#
+## Output the full design, keep note of which plants we're measuring
+#
 plants$measured <- ifelse(plants$plant_id %in% measured_plants$plant_id, TRUE, FALSE)
 
 plants <- plants %>%
   arrange(run, chamber, treat, plant) %>%
   mutate(tray = ceiling(row_number() / 6)) %>%  # sequential trays, 6 plants each
   select(run, chamber, treat, plant, tray, plant_id, measured, everything())
-
 
 write.csv(plants, "full_experiment_grid.csv", row.names = FALSE)
 
