@@ -72,6 +72,17 @@ measured_plants <- do.call(rbind, sampled_groups)
 # should be 3 runs * 2 chambers * 4 treatments * 6 plants = 144
 nrow(measured_plants)  
 
+plants$measured <- ifelse(plants$plant_id %in% measured_plants$plant_id, TRUE, FALSE)
+
+plants <- plants %>%
+  arrange(run, chamber, treat, plant) %>%
+  mutate(tray = ceiling(row_number() / 6)) %>%  # sequential trays, 6 plants each
+  select(run, chamber, treat, plant, tray, plant_id, measured, everything())
+
+
+write.csv(plants, "full_experiment_grid.csv", row.names = FALSE)
+
+
 #
 ## Expand across weeks
 #
@@ -199,7 +210,7 @@ ggsave(filename = "Anet_experiment.png", plot = p, width = 8, height = 6,
 # more than 80% is enough
 
 powerSim(m, test = fixed("drought:week", "t"), nsim = 200)
-# Result? we would detect an effect of drought x heat 100% of the time, 
+# Result? we would detect an effect of drought x heat 98% of the time, 
 
 powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
 # Result? we would detect an effect of heat 100% of the time, 
