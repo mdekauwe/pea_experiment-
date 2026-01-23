@@ -75,7 +75,8 @@ nrow(measured_plants)
 #
 ## Output the full design, keep note of which plants we're measuring
 #
-plants$measured <- ifelse(plants$plant_id %in% measured_plants$plant_id, TRUE, FALSE)
+plants$measured <- ifelse(plants$plant_id %in% measured_plants$plant_id, TRUE, 
+                          FALSE)
 
 plants <- plants %>%
   arrange(run, chamber, treat, plant) %>%
@@ -86,7 +87,7 @@ write.csv(plants, "full_experiment_grid.csv", row.names = FALSE)
 
 
 #
-## Expand across weeks
+## Expand the experimentacross weeks
 #
 design <- expand.grid(plant_id = measured_plants$plant_id, week = 1:n_weeks)
 design <- merge(design, measured_plants, by = "plant_id")
@@ -195,7 +196,7 @@ p <- ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, group = trea
                   fill = treat), alpha = 0.2, color = NA) +       
     labs(
       x = "Week",
-      y = expression(paste("Anet (", mu, "mol ", m^-2, s^-1, ")")),
+      y = expression(Anet~"("*mu*" mol "*m^-2*" "*s^-1*")"),
       color = "Treatment",
       fill = "Treatment") +
     theme_minimal(base_size = 14) +
@@ -205,6 +206,7 @@ p <- ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, group = trea
 ggsave(filename = "Anet_experiment.png", plot = p, width = 8, height = 6, 
        dpi = 300)
 
+print(p)
 #
 ## Power analysis
 #
