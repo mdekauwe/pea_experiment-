@@ -68,6 +68,9 @@ for (i in seq_along(plant_groups)) {
 }
 measured_plants <- do.call(rbind, sampled_groups)
 
+# Add column of measured plants back to the overall experimental design
+plants$measured <- plants$plant_id %in% measured_plants$plant_id
+
 # check this is correct
 # 24 groups × 6 plants = 144 rows
 # 3 runs x 2 chambers x 4 treatments x 6 plants = 144 rows
