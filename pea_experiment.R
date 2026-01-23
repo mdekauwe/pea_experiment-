@@ -218,13 +218,27 @@ print(p)
 
 # more than 80% is enough
 
+# weeks as a numeric
+# the model estimates one slope for week
+
 powerSim(m, test = fixed("drought:week", "t"), nsim = 200)
-# Result? we would detect an effect of drought x heat 98% of the time, 
+#Result? we would detect an effect of drought x heat 98% of the time, 
 
 powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
-# Result? we would detect an effect of heat 100% of the time, 
+#Result? we would detect an effect of heat 100% of the time, 
 
 powerSim(m, test = fixed("drought:temp:week", "t"), nsim = 200)
-# Result? we would detect an effect of drought x heat 82% of the time, 
+#Result? we would detect an effect of drought x heat 82% of the time, 
 
+###
+# weeks as a factor...
+# the model estimates one slope for week
+
+# then we'd have to do something like...
+#powerSim(m, test = fixed("drought:week2", "t"), nsim = 200)
+#powerSim(m, test = fixed("drought:week3", "t"), nsim = 200)
+
+#powerSim(m, test = fixed("drought:week", "f"), nsim = 200)
+#powerSim(m, test = fixed("temp:week", "f"), nsim = 200)
+#powerSim(m, test = fixed("drought:temp:week", "f"), nsim = 200)
 
