@@ -16,6 +16,8 @@ n_plants <- 36
 n_weeks <- 8
 n_runs <- 3
 n_measured <- 6
+n_stress_weeks <- 2   # number of weeks with stress
+
 
 mu <- 10                   # photosynthetic rate, umol m-2 s-1
 
@@ -112,9 +114,8 @@ heat_effect <- ifelse(design$treat == "heat", -effect_heat, 0)
 # interaction effect only for combined stress
 interaction_effect <- ifelse(design$treat == "heat_drought", -effect_drought_heat, 0)
 
-
-# treatment applies only in the last 2 weeks
-stress_weeks <- 7:8
+# treatment applies only in the last N weeks
+stress_weeks <- (n_weeks - n_stress_weeks + 1):n_weeks
 
 design$mu <- baseline + ifelse(design$week %in% stress_weeks,
                                drought_effect + heat_effect + interaction_effect, 
