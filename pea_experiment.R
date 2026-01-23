@@ -187,6 +187,16 @@ summary(m)
 # temp:week, effect of heat over changing weeks= -0.37
 # drought:temp:week, three way interaction = 0.24
 
+# experimental unit is different for heat though...
+chamber_means <- design %>%
+  group_by(run, chamber, temp, week) %>%
+  summarise(Anet = mean(Anet), .groups = "drop")
+
+m_chamber <- lmer(Anet ~ temp * week + (1 | run), data = chamber_means)
+summary(m_chamber)
+
+
+
 
 #
 ## Plot the experiment
