@@ -191,6 +191,7 @@ ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, group = treat)) +
     legend.position = "top",
     panel.grid.minor = element_blank()
   )
+ggsave(filename = "Anet_experiment.png", plot = p, width = 8, height = 6, dpi = 300)
 
 #
 ## Power analysis
