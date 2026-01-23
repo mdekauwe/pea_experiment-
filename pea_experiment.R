@@ -146,6 +146,10 @@ design$resid <- rnorm(nrow(design), 0, sd_resid)
 design$Anet <- (design$mu + design$rand_eff_run + design$rand_eff_chamber + 
                 design$rand_eff_plant + design$resid)
 
+
+#m <- lmer(Anet ~ drought * temp * week + (1 | run) + (1 | run:chamber) + 
+#            (1 | plant_id), data=design)
+
 m <- lmer(Anet ~ drought * temp * factor(week) + 
             (1 | run) + (1 | run:chamber) + (1 | plant_id), 
           data = design)
@@ -194,7 +198,7 @@ ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, group = treat)) +
 
 # more than 80% is enough
 
-powerSim(m, test = fixed("drought:temp", "t"), nsim = 200)
+powerSim(m, test = fixed("drought:week", "t"), nsim = 200)
 # Result? we would detect an effect of drought x heat 100% of the time, 
 
 
