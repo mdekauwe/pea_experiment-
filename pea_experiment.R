@@ -80,7 +80,10 @@ plants$measured <- ifelse(plants$plant_id %in% measured_plants$plant_id, TRUE,
 
 plants <- plants %>%
   arrange(run, chamber, treat, plant) %>%
-  mutate(tray = ceiling(row_number() / 6)) %>%  # sequential trays, 6 plants each
+  group_by(run, chamber, treat) %>%
+  mutate(tray = ceiling(plant / 6)) %>%  # tray 1-6 within each treatment
+  ungroup() %>%
+  mutate(measured = plant_id %in% measured_plants$plant_id) %>%
   select(run, chamber, treat, plant, tray, plant_id, measured, everything())
 
 write.csv(plants, "full_experiment_grid.csv", row.names = FALSE)
@@ -161,9 +164,11 @@ design$Anet <- (design$mu + design$rand_eff_run + design$rand_eff_chamber +
                 design$rand_eff_plant + design$resid)
 
 
+# week is a numeric, so we have a linear effect across week
 m <- lmer(Anet ~ drought * temp * week + (1 | run) + (1 | run:chamber) + 
             (1 | plant_id), data=design)
 
+# we could treat week as a categorical, each week would be independent 
 #m <- lmer(Anet ~ drought * temp * factor(week) + 
 #            (1 | run) + (1 | run:chamber) + (1 | plant_id), 
 #         data = design)
