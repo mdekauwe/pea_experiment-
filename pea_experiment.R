@@ -80,7 +80,7 @@ design <- merge(design, measured_plants, by = "plant_id")
 
 # create treatment indicators
 design$drought <- ifelse(design$treat %in% c("drought", "heat_drought"), 1, 0)
-design$temp    <- ifelse(design$treat %in% c("heat", "heat_drought"), 1, 0)
+design$temp <- ifelse(design$treat %in% c("heat", "heat_drought"), 1, 0)
 
 #
 ## simulate random effects
@@ -147,12 +147,12 @@ design$Anet <- (design$mu + design$rand_eff_run + design$rand_eff_chamber +
                 design$rand_eff_plant + design$resid)
 
 
-#m <- lmer(Anet ~ drought * temp * week + (1 | run) + (1 | run:chamber) + 
-#            (1 | plant_id), data=design)
+m <- lmer(Anet ~ drought * temp * week + (1 | run) + (1 | run:chamber) + 
+            (1 | plant_id), data=design)
 
-m <- lmer(Anet ~ drought * temp * factor(week) + 
-            (1 | run) + (1 | run:chamber) + (1 | plant_id), 
-          data = design)
+#m <- lmer(Anet ~ drought * temp * factor(week) + 
+#            (1 | run) + (1 | run:chamber) + (1 | plant_id), 
+#         data = design)
 
 summary(m)
 
@@ -200,7 +200,6 @@ ggsave(filename = "Anet_experiment.png", plot = p, width = 8, height = 6,
 
 powerSim(m, test = fixed("drought:week", "t"), nsim = 200)
 # Result? we would detect an effect of drought x heat 100% of the time, 
-
 
 powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
 # Result? we would detect an effect of heat 100% of the time, 
