@@ -172,9 +172,8 @@ design$Anet <- (design$mu + design$rand_eff_run + design$rand_eff_chamber +
 #            (1 | plant_id), data=design)
 
 # we could treat week as a categorical, each week would be independent 
-#m <- lmer(Anet ~ drought * temp * factor(week) + 
-#            (1 | run) + (1 | run:chamber) + (1 | plant_id), 
-#         data = design)
+#m <- lmer(Anet ~ drought * temp * factor(week) + (1 | run) + 
+#            (1 | run:chamber) + (1 | plant_id), data = design)
 
 #summary(m)
 
