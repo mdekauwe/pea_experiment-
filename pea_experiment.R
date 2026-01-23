@@ -103,23 +103,22 @@ names(rand_eff_plant) <- unique(design$plant_id)
 
 baseline <- mu  # 10 umol m-2 s-1
 
-# effect of drought treatment
-# design$drought = 1 if plant is in drought or heat_drought, 0 otherwise
-drought_effect <- -effect_drought * design$drought
+# drought effect only for drought alone
+drought_effect <- ifelse(design$treat == "drought", -effect_drought, 0)
 
-# effect of heat treatment
-# design$temp = 1 if plant is in heat or heat_drought, 0 otherwise
-heat_effect <- -effect_heat * design$temp
+# heat effect only for heat alone
+heat_effect <- ifelse(design$treat == "heat", -effect_heat, 0)
 
-# interaction effect (drought x heat)
-interaction_effect <- -effect_drought_heat * design$drought * design$temp
+# interaction effect only for combined stress
+interaction_effect <- ifelse(design$treat == "heat_drought", -effect_drought_heat, 0)
 
-# treatment applies only in the last 3 weeks
-stress_weeks <- 6:8
 
-design$mu <- baseline +
-  ifelse(design$week %in% stress_weeks,
-         drought_effect + heat_effect + interaction_effect, 0)
+# treatment applies only in the last 2 weeks
+stress_weeks <- 7:8
+
+design$mu <- baseline + ifelse(design$week %in% stress_weeks,
+                               drought_effect + heat_effect + interaction_effect, 
+                               0)
 
 
 
@@ -155,13 +154,13 @@ m <- lmer(Anet ~ drought * temp * week + (1 | run) + (1 | run:chamber) +
 summary(m)
 
 # this simulates a baseline anet of 9.23
-# drought = 0.24
-# temp = 1.0
+# drought = 0.19
+# temp = 0.95
 # week = 0.05
-# drought:temp interactions = 0.63
-# drought:week, effect of drought over changing weeks = -0.29
-# temp:week, effect of heat over changing weeks= -0.44
-# drought:temp:week, three way interaction = -0.34
+# drought:temp interactions = -0.28
+# drought:week, effect of drought over changing weeks = -0.24
+# temp:week, effect of heat over changing weeks= -0.37
+# drought:temp:week, three way interaction = 0.24
 
 
 #
@@ -194,16 +193,16 @@ ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, group = treat)) +
 ## Power analysis
 #
 
+# more than 80% is enough
+
 powerSim(m, test = fixed("drought:temp", "t"), nsim = 200)
 # Result? we would detect an effect of drought x heat 100% of the time, 
-# more than 80% is enough
+
 
 powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
 # Result? we would detect an effect of heat 100% of the time, 
-#more than 80% is enough
 
 powerSim(m, test = fixed("drought:temp:week", "t"), nsim = 200)
-# Result? we would detect an effect of drought x heat 98% of the time, 
-# more than 80% is enough
+# Result? we would detect an effect of drought x heat 82% of the time, 
 
 
