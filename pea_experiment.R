@@ -189,7 +189,7 @@ design$Anet <- (design$mu + design$rand_eff_run + design$rand_eff_chamber +
 
 
 
-
+# capture hierarchical structure of the split-plot experiment
 m_split <- lmer(Anet ~ drought * temp * week +
                   (1 | run/chamber) +         # whole-plot variability for heat, nested
                   (1 | run:chamber:plant_id), # sub-plot variability for drought
