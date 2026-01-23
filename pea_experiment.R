@@ -93,7 +93,7 @@ write.csv(plants, "full_experiment_grid.csv", row.names = FALSE)
 
 
 #
-## Expand the experimentacross weeks
+## Expand the experiment across weeks
 #
 design <- expand.grid(plant_id = measured_plants$plant_id, week = 1:n_weeks)
 design <- merge(design, measured_plants, by = "plant_id")
@@ -242,18 +242,6 @@ print(p)
 
 # more than 80% is enough
 
-# weeks as a numeric
-# the model estimates one slope for week
-
-#powerSim(m, test = fixed("drought:week", "t"), nsim = 200)
-#Result? we would detect an effect of drought x heat 99% of the time, 
-
-#powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
-#Result? we would detect an effect of heat 100% of the time, 
-
-#powerSim(m, test = fixed("drought:temp:week", "t"), nsim = 200)
-#Result? we would detect an effect of drought x heat 98% of the time, 
-
 # Number of experimental units per factor:
 # - drought: number of plants per chamber/run
 m_split <- extend(m_split, along = "plant_id", n = length(unique(design$plant_id)))
@@ -266,6 +254,24 @@ chamber_means <- design %>%
 
 m_chamber <- lmer(Anet ~ temp * week + (1 | run), data = chamber_means)
 powerSim(m_chamber, test = fixed("temp:week", "t"), nsim = 200)
+
+
+## old below, which is wrong
+
+
+# weeks as a numeric
+# the model estimates one slope for week
+
+#powerSim(m, test = fixed("drought:week", "t"), nsim = 200)
+#Result? we would detect an effect of drought x heat 99% of the time, 
+
+#powerSim(m, test = fixed("temp:week", "t"), nsim = 200)
+#Result? we would detect an effect of heat 100% of the time, 
+
+#powerSim(m, test = fixed("drought:temp:week", "t"), nsim = 200)
+#Result? we would detect an effect of drought x heat 98% of the time, 
+
+
 
 ###
 # weeks as a factor...
