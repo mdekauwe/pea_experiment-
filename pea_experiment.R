@@ -60,10 +60,10 @@ sampled_groups <- vector("list", length(plant_groups))
 names(sampled_groups) <- names(plant_groups)
 
 # Randomly select n_measured plants per group
-for (i in seq_along(plant_groups)) {
-  df <- plant_groups[[i]]  
-  selected_rows <- sample(nrow(df), n_measured)
-  sampled_groups[[i]] <- df[selected_rows, ]
+for (i in seq_along(plant_groups)) { 
+  df <- plant_groups[[i]]  # extract the i-th group as a dataframe
+  selected_rows <- sample(nrow(df), n_measured) # pick random row without replacement
+  sampled_groups[[i]] <- df[selected_rows, ] # store them
 }
 
 measured_plants <- do.call(rbind, sampled_groups)
