@@ -208,12 +208,6 @@ summary(m_split)
 # sum of their individual effects. 
 
 
-m_split <- lmer(Anet ~ drought * temp * week +
-                  (1 | run/chamber) +
-                  (1 | run:chamber:plant_id),
-                data = design)
-
-summary(m_split)
 
 ## Plot the experiment
 #
