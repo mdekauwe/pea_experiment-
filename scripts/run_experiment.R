@@ -72,18 +72,6 @@ m_split <- lmer(Anet ~ drought * temp * week +
 
 summary(m_split)
 
-# baseline = 9.2
-# drought = 0.19
-# temp = 0.95
-# week = 0.05
-# drought:temp = -0.28 # not significant, not enough power to detect
-# drought:week = -0.24
-# temp:week = -0.37
-# drought:temp:week = 0.24773 # significant,
-# so total slope = 0.05678-0.24342-0.37146+ 0.24773 = -0.3
-# week + drought:week + temp:week +drought:temp:week
-#
-
 ### Sudden stress
 #
 # Analysis of Anet using a split-plot linear mixed model showed that drought
