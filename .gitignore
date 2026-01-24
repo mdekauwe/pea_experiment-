@@ -1,3 +1,5 @@
 *.csv
 *.png
 .Rproj.user
+*.RData
+*.pdf
