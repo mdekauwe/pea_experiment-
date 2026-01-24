@@ -84,14 +84,27 @@ summary(m_split)
 # week + drought:week + temp:week +drought:temp:week
 #
 
+### Sudden stress
+#
 # Analysis of Anet using a split-plot linear mixed model showed that drought
-# significantly influenced the decline in Anet
+# significantly influenced the decline in Anet over time
 # (drought × week: estimate = -0.24, t = -4.13), and heat also has a significant
 # effect (temp × week: estimate = -0.37, t = -6.31). A significant three-way
 # interaction between drought, heat, and week
 # (drought × temp × week: estimate = 0.25, t = 2.98), indicated that the
-# combined impact of drought and heat on Anet over time differed from the
-# sum of their individual effects.
+# combined impact of drought and heat on Anet over time differed from their 
+# individual effects.
+
+### Gradual stress
+#
+# Analysis of Anet using a split-plot linear mixed model showed that drought
+# significantly influenced the decline in Anet over time
+# (drought × week: estimate = -0.17, t = -2.89), and heat also has a significant
+# effect (temp × week: estimate = -0.27, t = -4.71). A significant three-way
+# interaction between drought, heat, and week
+# (drought × temp × week: estimate = 0.17, t = 2.08), indicated that the
+# combined impact of drought and heat on Anet over time differed from their 
+# individual effects.
 
 
 ##############################################
