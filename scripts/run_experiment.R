@@ -136,6 +136,7 @@ print(p)
 # - drought: number of plants per chamber/run
 m_split <- extend(m_split, along = "plant_id", n = length(unique(design$plant_id)))
 powerSim(m_split, test = fixed("drought:week", "t"), nsim = 200)
+#81%
 
 # - heat: number of chambers per run
 chamber_means <- design %>%
@@ -144,3 +145,4 @@ chamber_means <- design %>%
 
 m_chamber <- lmer(Anet ~ temp * week + (1 | run), data = chamber_means)
 powerSim(m_chamber, test = fixed("temp:week", "t"), nsim = 200)
+# 72% 
