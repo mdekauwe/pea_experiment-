@@ -2,7 +2,7 @@ library(ggplot2)
 library(dplyr)
 
 simulate_experiment <- function(params, treatments, seed = NULL,
-                                write_grid = FALSE, ramp_stress = FALSE,
+                                write_grid = FALSE, gradual_stress = FALSE,
                                 out_dir = NULL) {
 
   if (!is.null(seed)) {
@@ -127,7 +127,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   design <- design %>%
     left_join(effect_map, by = "treat")
 
-  if (!ramp_stress) {
+  if (!gradual_stress) {
     design <- design %>%
       mutate(mu = params$mu + ifelse(week %in% stress_weeks, base_effect, 0))
   } else {

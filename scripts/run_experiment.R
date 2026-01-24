@@ -53,7 +53,7 @@ s <- simulate_experiment(
   treatments = treatments,
   seed = 123,
   write_grid = TRUE,
-  ramp_stress = FALSE,
+  gradual_stress = TRUE,
   out_dir = out_dir
 )
 
