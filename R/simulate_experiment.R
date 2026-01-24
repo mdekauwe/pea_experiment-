@@ -146,24 +146,26 @@ simulate_experiment <- function(params, treatments, seed = NULL,
       
       # run-to-run variability
       # Each run has a slightly different "baseline" Anet
-      rand_eff_run = rand_eff_run[as.character(run)],
+      # rand_eff_run is a vector of random numbers, one per experimental run
+      rand_eff_run = rand_eff_run[as.character(run)], #index by run ID
 
       # chamber-within-run variability
       # Each chamber within a run may differ slightly
       # Nested: run:chamber
+      # rand_eff_chamber is a vector of random numbers, one per chamber
       rand_eff_chamber = rand_eff_chamber[as.character(interaction(run, chamber))],
 
       # plant-to-plant variability
       # individual plants differ biologically even under same treatment
+      # rand_eff_plant is a vector of random numbers, one per plant
       rand_eff_plant = rand_eff_plant[as.character(plant_id)],
 
-      # residual week-to-week variation
+      # residual week-to-week variation - measurement error v
       # captures natural fluctuations in Anet over repeated measurements
       resid = rnorm(n(), 0, params$sd$resid),
 
       # combine fixed and random effects
-      Anet = mu + rand_eff_run + rand_eff_chamber +
-        rand_eff_plant + resid
+      Anet = mu + rand_eff_run + rand_eff_chamber + rand_eff_plant + resid
     )
 
   list(
