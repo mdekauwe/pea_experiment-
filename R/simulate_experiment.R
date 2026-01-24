@@ -122,7 +122,8 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     base_effect = treatment_effects[treatments]
   )
   
-
+  # attach the base_effects to each row in the design, so the simulation knows
+  # which treatement effect to apply to each plant in each week
   design <- design %>%
     left_join(effect_map, by = "treat")
 
