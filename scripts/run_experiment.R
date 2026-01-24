@@ -48,7 +48,7 @@ out_dir <- "~/Desktop/"
 ################################################################################
 
 
-sim <- simulate_experiment(
+s <- simulate_experiment(
   params = params,
   treatments = treatments,
   seed = 123,
@@ -57,8 +57,8 @@ sim <- simulate_experiment(
   out_dir = out_dir
 )
 
-design <- sim$design
-plants <- sim$plants_full
+design <- s$design
+plants <- s$plants_full
 
 #############################################
 ## Fit split-plot mixed model
@@ -66,7 +66,7 @@ plants <- sim$plants_full
 
 # capture hierarchical structure of the split-plot experiment
 m_split <- lmer(Anet ~ drought * temp * week +
-                  (1 | run/chamber) +         # whole-plot variability for heat, nested
+                  (1 | run/chamber) + # whole-plot variability for heat, nested
                   (1 | run:chamber:plant_id), # sub-plot variability for drought
                   data = design)
 
@@ -103,7 +103,8 @@ summary_df <- design %>%
   summarise(mean_Anet = mean(Anet), se_Anet = sd(Anet) / sqrt(n()),
             .groups = "drop")
 
-p <- ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, group = treat)) +
+p <- ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat, 
+            group = treat)) +
       geom_line(size = 1) +
       geom_point(size = 2) +
     geom_ribbon(aes(ymin = mean_Anet - se_Anet,
