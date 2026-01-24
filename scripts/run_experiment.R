@@ -14,18 +14,18 @@ source("R/simulate_experiment.R")
 ################################################################################
 
 #
-## Experiment parameters
+## Set your experiment parameters
 #
 
 params <- list(
-  n_chambers = 2,
-  n_plants= 36,
-  n_weeks  = 8,
-  n_runs = 3,
-  n_measured = 6,
-  n_stress_weeks = 2, # number of weeks with stress
+  n_runs = 3,           # number of experimental repeats
+  n_chambers = 2,       # number of growth chambers
+  n_plants = 36,        # number of plants within a treatment
+  n_measured = 6,       # number of measured plants
+  n_weeks  = 8,         # number of weeks of the experiment
+  n_stress_weeks = 2,   # number of weeks with stress
 
-  mu = 10, # baseline photosynthetic rate, umol m-2 s-1
+  mu = 10,              # baseline photosynthetic rate, umol m-2 s-1
 
   effect_frac = list(
     drought = 0.15,     # 15% reduction
@@ -34,10 +34,10 @@ params <- list(
   ),
 
   sd = list(
-    run = 0.8,       # between run variability, umol m-2 s-1
-    chamber  = 0.5,  # between chamber variability, umol m-2 s-1
-    plant = 2.0,     # between plant variability, umol m-2 s-1
-    resid = 1.5      # residual noise, umol m-2 s-1
+    run = 0.8,          # between run variability, umol m-2 s-1
+    chamber  = 0.5,     # between chamber variability, umol m-2 s-1
+    plant = 2.0,        # between plant variability, umol m-2 s-1
+    resid = 1.5         # residual noise, umol m-2 s-1
   )
 )
 
