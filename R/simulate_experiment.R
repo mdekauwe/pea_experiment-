@@ -85,8 +85,9 @@ simulate_experiment <- function(params, treatments, seed = NULL,
 
   # simulate random effects
 
-  # run effects
+  # run effects, generate N random numbers from a noraml distribution
   rand_eff_run <- rnorm(params$n_runs, 0, params$sd$run)
+  # name the vector by the run ID to match to the correct random effect
   names(rand_eff_run) <- as.character(seq_len(params$n_runs))
 
   # chamber within run effect
@@ -97,7 +98,6 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   # plant effect
   rand_eff_plant <- rnorm(length(unique(design$plant_id)), 0, params$sd$plant)
   names(rand_eff_plant) <- unique(design$plant_id)
-
 
 
   # fixed effects
