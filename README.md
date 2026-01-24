@@ -14,12 +14,14 @@ The core simulation function is in the `R/` directory:
 ```bash
 $ ls R
 simulate_experiment.R
+```
 
 There are two scripts for running and analysing the experiment:
 
 $ ls scripts/
 run_experiment.R
 run_and_analyse_by_week.R
+```
 
 scripts/run_experiment.R
 
