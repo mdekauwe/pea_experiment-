@@ -18,7 +18,8 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     drought_heat = params$effect_frac$drought_heat * params$mu
   )
 
-  # Generate all plants
+  # Generate all plants and store in a dataframe where each row is a unique
+  # combination of run x chamber x treatment x plant
   plants <- expand.grid(
     run = seq_len(params$n_runs),
     chamber = seq_len(params$n_chambers),
