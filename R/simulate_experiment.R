@@ -139,9 +139,11 @@ simulate_experiment <- function(params, treatments, seed = NULL,
       )
   }
 
-  # combine random + fixed effects
+  # combine random + fixed effects and calculate the simulated response for
+  # each plant x week in the experimental dataset
   design <- design %>%
     mutate(
+      
       # run-to-run variability
       # Each run has a slightly different "baseline" Anet
       rand_eff_run = rand_eff_run[as.character(run)],
