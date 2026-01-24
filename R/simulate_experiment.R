@@ -101,18 +101,27 @@ simulate_experiment <- function(params, treatments, seed = NULL,
 
 
   # fixed effects
-
+  
+  # work out when the stress begins, for ease I've forced this to be at the
+  # end of the experiment
   stress_weeks <- (params$n_weeks - params$n_stress_weeks + 1):params$n_weeks
-
+  
+  # create a vector treatment effects
+  treatment_effects <- c(
+    control = 0,
+    drought = -params$effects$drought,
+    heat = -params$effects$heat,
+    heat_drought = -params$effects$drought_heat
+  )
+  
+  # Create a small table (tibble) of the treatment and base effects so we can 
+  # join to the main experimental design, so each plant in the experiment knows 
+  # its base effect
   effect_map <- tibble(
     treat = factor(treatments, levels = treatments),
-    base_effect = c(
-      control = 0,
-      drought = -params$effects$drought,
-      heat = -params$effects$heat,
-      heat_drought = -params$effects$drought_heat
-    )[treatments]
+    base_effect = treatment_effects[treatments]
   )
+  
 
   design <- design %>%
     left_join(effect_map, by = "treat")
