@@ -62,19 +62,26 @@ simulate_experiment <- function(params, treatments, seed = NULL,
               file = file.path(out_dir, "full_experiment_grid.csv"),
               row.names = FALSE)
   }
-
-  # Expand the experiment across weeks
-  design <- expand.grid(
+  
+  # Create plant x week combinations
+  plant_week <- expand.grid(
     plant_id = measured_plants$plant_id,
     week = seq_len(params$n_weeks),
     KEEP.OUT.ATTRS = FALSE
-  ) %>%
-    left_join(measured_plants, by = "plant_id") %>%
+  )
+  
+  # Add in metadata to the overal experimental design grid
+  design <- plant_week %>%
+    left_join(measured_plants, by = "plant_id")
+  
+  # Add factors for modelling
+  design <- design %>%
     mutate(
       treat = factor(treat, levels = treatments),
       drought = as.integer(treat %in% c("drought", "heat_drought")),
       temp    = as.integer(treat %in% c("heat", "heat_drought"))
     )
+  
 
   # simulate random effects
 
