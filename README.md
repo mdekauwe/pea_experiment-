@@ -6,3 +6,25 @@ This repository contains code to simulate a split-plot experiment measuring phot
 
 - **`R/`** – Contains the simulation function.
 - **`scripts/`** – Contains scripts to run and analyse the experiment.
+
+## Running the simulations
+
+The core simulation function is in the `R/` directory:
+
+```bash
+$ ls R
+simulate_experiment.R
+
+There are two scripts for running and analysing the experiment:
+
+$ ls scripts/
+run_experiment.R
+run_and_analyse_by_week.R
+
+scripts/run_experiment.R
+
+Runs the simulation and fits a split-plot linear mixed model treating week as a numeric variable. This estimates the overall effect of week on Anet over time.
+
+scripts/run_and_analyse_by_week.R
+
+Runs the simulation and fits a split-plot linear mixed model treating week as a factor. This estimates treatment effects separately for each week, allowing you to see how drought, heat, and their combination vary across weeks.
