@@ -168,8 +168,8 @@ simulate_experiment <- function(params, treatments, seed = NULL,
       Anet = mu + rand_eff_run + rand_eff_chamber + rand_eff_plant + resid
     )
 
-  list(
+  return(list(
     design = design,
     plants_full = plants_full
-  )
+  ))
 }
