@@ -25,9 +25,11 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     chamber = seq_len(params$n_chambers),
     treat = treatments,
     plant = seq_len(params$n_plants),
-    KEEP.OUT.ATTRS = FALSE
-  ) %>%
-    # Make a readable plant ID
+    KEEP.OUT.ATTRS = FALSE # prevents metadata related to levels, as messes with mutate
+  ) 
+  
+  # Make a readable plant ID and add to the dataframe, make treatment a factor
+  plants <- plants %>%
     mutate(
       treat = factor(treat, levels = treatments),
       plant_id = sprintf("r%d_c%d_%s_p%d", run, chamber, treat, plant)
