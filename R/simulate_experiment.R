@@ -80,7 +80,8 @@ simulate_experiment <- function(params, treatments, seed = NULL,
       pull(n) == 1
   ))
 
-  # Create the full design, keep note of which plants we're measuring
+  # Create the full experimental design, keep note of which plants 
+  # we're measuring
   plant_grid <- plant_grid %>%
     mutate(measured = plant_id %in% measured_plants$plant_id)
 
@@ -98,11 +99,11 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   )
   
   # Add in metadata to the overall experimental design grid
-  design <- plant_week %>%
+  experiment_df <- plant_week %>%
     left_join(measured_plants, by = "plant_id")
   
   # Add factors for modelling
-  design <- design %>%
+  experiment_df <- experiment_df %>%
     mutate(
       treat = factor(treat, levels = treatments),
       drought = as.integer(treat %in% c("drought", "heat_drought")),
@@ -113,7 +114,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   # simulate random effects
   
   # Create a string ID for run × chamber
-  design <- design %>%
+  experiment_df <- experiment_df %>%
     mutate(run_chamber_id = paste0("r", run, "_c", chamber))
   
   # run effects, generate N random numbers from a noraml distribution
@@ -122,12 +123,12 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   names(rand_eff_run) <- as.character(seq_len(params$n_runs))
 
   # chamber within run effect
-  rand_eff_chamber <- rnorm(length(unique(design$run_chamber_id)), 0, params$sd$chamber)
-  names(rand_eff_chamber) <- unique(design$run_chamber_id)
+  rand_eff_chamber <- rnorm(length(unique(experiment_df$run_chamber_id)), 0, params$sd$chamber)
+  names(rand_eff_chamber) <- unique(experiment_df$run_chamber_id)
 
   # plant effect
-  rand_eff_plant <- rnorm(length(unique(design$plant_id)), 0, params$sd$plant)
-  names(rand_eff_plant) <- unique(design$plant_id)
+  rand_eff_plant <- rnorm(length(unique(experiment_df$plant_id)), 0, params$sd$plant)
+  names(rand_eff_plant) <- unique(experiment_df$plant_id)
 
 
   # fixed effects
@@ -159,7 +160,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   
   # attach the base_effects to each row in the design, so the simulation knows
   # which treatement effect to apply to each plant in each week
-  design <- design %>%
+  experiment_df <- experiment_df %>%
     left_join(effect_map, by = "treat")
   
   # Determine when stress starts
@@ -168,7 +169,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   
   if (gradual_stress) {
     
-    design <- design %>%
+    experiment_df <- experiment_df %>%
       mutate(
         mu = case_when(
           week < stress_start ~ params$mu,
@@ -180,7 +181,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   } else {
     
     # sudden stress applied only during stress weeks
-    design <- design %>%
+    experiment_df <- experiment_df %>%
       mutate(
         mu = ifelse(week %in% stress_weeks, params$mu + base_effect, params$mu)
       )
@@ -188,7 +189,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
 
   # combine random + fixed effects and calculate the simulated response for
   # each plant x week in the experimental dataset
-  design <- design %>%
+  experiment_df <- experiment_df %>%
     mutate(
       rand_eff_run = ifelse(week == 1, 0, rand_eff_run[as.character(run)]),
       rand_eff_chamber = ifelse(week == 1, 0, rand_eff_chamber[run_chamber_id]),
@@ -199,7 +200,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     )
 
   return(list(
-    design = design,
+    experiment_df = experiment_df,
     plant_grid = plant_grid
   ))
 }

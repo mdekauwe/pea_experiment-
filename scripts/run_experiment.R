@@ -52,7 +52,8 @@ s <- simulate_experiment(params = params, treatments = treatments, seed = 124,
                          write_grid = TRUE, gradual_stress = TRUE, 
                          out_dir = out_dir)
 
-design <- s$design
+plant_grid <- s$plant_grid        # full plant layout, all plants
+experiment_df <- s$experiment_df  # measured plants across weeks
 
 #############################################
 ## Fit split-plot mixed model
@@ -62,19 +63,19 @@ design <- s$design
 #m_split <- lmer(Anet ~ drought * temp * week +
 #                  (1 | run/chamber) + # whole-plot variability for heat, nested
 #                  (1 | run:chamber:plant_id), # sub-plot variability for drought
-#                  data = design)
+#                  data = experiment_df)
 
 #m_split <- lmer(Anet ~ drought * temp * week +
 #                  (1 | run/chamber) +          # whole-plot variability for heat
 #                  (1 | run:chamber:tray) +     # tray-level variability
 #                  (1 | run:chamber:plant_id),  # residual plant-level variability
-#                data = design)
+#                data = experiment_df)
 
 m_split <- lmer( Anet ~ drought * temp * week +
                    (1 | run/chamber) +           # chamber random effect
                    (1 | run:chamber:tray_pos) +  # tray random effect
                    (1 | run:chamber:plant_id),   # plant-level random effect
-                 data = design)
+                 data = experiment_df)
 
 summary(m_split)
 
@@ -110,7 +111,7 @@ summary(m_split)
 ## Plot the experiment
 ##############################################
 
-summary_df <- design %>%
+summary_df <- experiment_df %>%
   group_by(week, treat) %>%
   summarise(mean_Anet = mean(Anet), se_Anet = sd(Anet) / sqrt(n()),
             .groups = "drop")
@@ -146,12 +147,12 @@ print(p)
 
 # Number of experimental units per factor:
 # - drought: number of plants per chamber/run
-#m_split <- extend(m_split, along = "plant_id", n = length(unique(design$plant_id)))
+#m_split <- extend(m_split, along = "plant_id", n = length(unique(experimental_df$plant_id)))
 #powerSim(m_split, test = fixed("drought:week", "t"), nsim = 200)
 #81%
 
 # - heat: number of chambers per run
-#chamber_means <- design %>%
+#chamber_means <- experimental_df %>%
 #  group_by(run, chamber, temp, week) %>%
 #  summarise(Anet = mean(Anet), .groups = "drop")
 
