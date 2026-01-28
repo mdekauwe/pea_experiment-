@@ -28,11 +28,18 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     KEEP.OUT.ATTRS = FALSE
   )
   
-  # Compute treatment vectors for each chamber
+  # Define treatment assignment vectors for each chamber.
+  # Each chamber receives a repeating sequence of treatments, one  per plant in 
+  # that chamber.
+  # - Chamber 1 alternates between "control" and "drought"
+  # - Chamber 2 alternates between "heat" and "heat_drought"
   treat_ch1 <- rep(c("control", "drought"), length.out = params$n_plants)
   treat_ch2 <- rep(c("heat", "heat_drought"), length.out = params$n_plants)
   
-  # Assign treatments 
+  # Assign treatments to plants based on their chamber.
+  # For each run and chamber, add a 'treat' column:
+  # - Plants in chamber 1 receive treatments from treat_ch1
+  # - Plants in chamber 2 receive treatments from treat_ch2
   plants_df <- plants_df %>%
     group_by(run, chamber) %>%
     mutate(
@@ -40,7 +47,8 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     ) %>%
     ungroup()
   
-  # Convert treat to a factor with the correct levels
+  # Ensure treat is a factor with the correct order of levels.
+  # Levels are set based on the treatments vector.
   plants_df <- plants_df %>%
     mutate(treat = factor(treat, levels = treatments))
   
@@ -50,8 +58,13 @@ simulate_experiment <- function(params, treatments, seed = NULL,
       plant_id = sprintf("r%d_c%d_%s_p%d", run, chamber, treat, plant)
     )
   
-  # Assign tray numbers to plants within each run × chamber × treatment.
-  # Each tray contains 6 plants, so plants 1–6 are tray 1, 7–12 are tray 2, etc.
+  # Assign tray numbers to plants within each experimental unit.
+  # Experimental unit depends on treatment:
+  # * Drought treatments are applied at the plant level
+  # * Heat treatments are applied at the chamber level
+  # Plants are first ordered by run, chamber, treatment, and plant ID
+  # Each tray holds 6 plants. The ceiling(plant / 6) operation assigns:
+  # plants 1–6 -> tray 1; plants 7–12 -> tray 2; etc
   plant_grid <- plants_df %>%
     arrange(run, chamber, treat, plant) %>%
     group_by(run, chamber, treat) %>%
