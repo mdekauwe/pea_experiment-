@@ -70,11 +70,17 @@ plants <- s$plants_full
 #                  (1 | run:chamber:plant_id), # sub-plot variability for drought
 #                  data = design)
 
-m_split <- lmer(Anet ~ drought * temp * week +
-                  (1 | run/chamber) +          # whole-plot variability for heat
-                  (1 | run:chamber:tray) +     # tray-level variability
-                  (1 | run:chamber:plant_id),  # residual plant-level variability
-                data = design)
+#m_split <- lmer(Anet ~ drought * temp * week +
+#                  (1 | run/chamber) +          # whole-plot variability for heat
+#                  (1 | run:chamber:tray) +     # tray-level variability
+#                  (1 | run:chamber:plant_id),  # residual plant-level variability
+#                data = design)
+
+m_split <- lmer( Anet ~ drought * temp * week +
+                   (1 | run/chamber) +           # chamber random effect
+                   (1 | run:chamber:tray_pos) +  # tray random effect
+                   (1 | run:chamber:plant_id),   # plant-level random effect
+                 data = design)
 
 summary(m_split)
 

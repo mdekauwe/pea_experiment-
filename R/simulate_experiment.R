@@ -50,30 +50,35 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     )
   
   # Assign tray numbers to plants within each run × chamber × treatment.
-  # Each tray contains 6 plants, so plants 1–6 are tray 1, 7–12 are tray 2, etc
+  # Each tray contains 6 plants, so plants 1–6 are tray 1, 7–12 are tray 2, etc.
   plants_full <- plants %>%
     arrange(run, chamber, treat, plant) %>%
     group_by(run, chamber, treat) %>%
-    mutate(tray = ceiling(plant / 6)) %>%  # 6 plants per tray
+    mutate(tray = ceiling(plant / 6)) %>%
     ungroup()
   
-  # Randomly select one plant per tray to be measured.
-  # Ensures each tray contributes exactly one plant to the measured dataset.
+  # Randomise tray positions within each run × chamber
+  plants_full <- plants_full %>%
+    group_by(run, chamber) %>%
+    mutate(
+      tray_pos = setNames(sample(unique(tray)), unique(tray))[as.character(tray)]
+    ) %>%
+    ungroup()
+  
+  # Randomly select one plant per tray to be measured
   measured_plants <- plants_full %>%
-    group_by(run, chamber, treat, tray) %>%
-    slice_sample(n = 1) %>%  # one plant per tray
+    group_by(run, chamber, tray) %>%  # only by tray
+    slice_sample(n = 1) %>%           # one plant per tray
     ungroup()
-  
   
   # Check number of sampled plants
   # calculate expected number based on treatments present per chamber
-  expected_plants <- measured_plants %>%
-    group_by(run, chamber) %>%
-    summarise(n_treat = n_distinct(treat), .groups = "drop") %>%
-    summarise(total = sum(n_treat * params$n_measured)) %>%
-    pull(total)
-  
-  stopifnot(nrow(measured_plants) == expected_plants)
+  stopifnot(all(
+    measured_plants %>%
+      group_by(run, chamber, tray) %>%
+      summarise(n = n()) %>%
+      pull(n) == 1
+  ))
 
   # Create the full design, keep note of which plants we're measuring
   plants_full <- plants_full %>%
