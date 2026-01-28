@@ -58,22 +58,10 @@ experiment_df <- s$experiment_df  # measured plants across weeks
 #############################################
 
 # capture hierarchical structure of the split-plot experiment
-#m_split <- lmer(Anet ~ drought * temp * week +
-#                  (1 | run/chamber) + # whole-plot variability for heat, nested
-#                  (1 | run:chamber:plant_id), # sub-plot variability for drought
-#                  data = experiment_df)
-
-#m_split <- lmer(Anet ~ drought * temp * week +
-#                  (1 | run/chamber) +          # whole-plot variability for heat
-#                  (1 | run:chamber:tray) +     # tray-level variability
-#                  (1 | run:chamber:plant_id),  # residual plant-level variability
-#                data = experiment_df)
-
-m_split <- lmer( Anet ~ drought * temp * week +
-                   (1 | run/chamber) +           # chamber random effect
-                   (1 | run:chamber:tray_pos) +  # tray random effect
-                   (1 | run:chamber:plant_id),   # plant-level random effect
-                 data = experiment_df)
+m_split <- lmer(Anet ~ drought * temp * week +
+                  (1 | run/chamber) +           # chamber random effect
+                  (1 | run:chamber:plant_id),   # plant-level random effect
+                data = experiment_df)
 
 summary(m_split)
 

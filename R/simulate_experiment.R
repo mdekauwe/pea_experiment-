@@ -65,7 +65,9 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     mutate(tray = ceiling(plant / 6)) %>% # calculate tray number within each treatment
     ungroup()
   
-  # Randomise the positions of trays within each run × chamber.
+  # Randomise the positions of trays within each run × chamber
+  # tray = the group of 6 plants within a treatment. This never changes
+  # tray_pos = a randomised position of that tray within the chamber for that run
   plant_grid <- plant_grid %>%
     group_by(run, chamber) %>%
     mutate(
