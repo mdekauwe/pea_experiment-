@@ -98,16 +98,19 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   
 
   # simulate random effects
-
+  
+  # Create a string ID for run × chamber
+  design <- design %>%
+    mutate(run_chamber_id = paste0("r", run, "_c", chamber))
+  
   # run effects, generate N random numbers from a noraml distribution
   rand_eff_run <- rnorm(params$n_runs, 0, params$sd$run)
   # name the vector by the run ID to match to the correct random effect
   names(rand_eff_run) <- as.character(seq_len(params$n_runs))
 
   # chamber within run effect
-  run_chamber_levels <- with(design, interaction(run, chamber, drop = TRUE))
-  rand_eff_chamber <- rnorm(length(unique(run_chamber_levels)), 0, params$sd$chamber)
-  names(rand_eff_chamber) <- unique(run_chamber_levels)
+  rand_eff_chamber <- rnorm(length(unique(design$run_chamber_id)), 0, params$sd$chamber)
+  names(rand_eff_chamber) <- unique(design$run_chamber_id)
 
   # plant effect
   rand_eff_plant <- rnorm(length(unique(design$plant_id)), 0, params$sd$plant)
@@ -167,8 +170,8 @@ simulate_experiment <- function(params, treatments, seed = NULL,
       # Each chamber within a run may differ slightly
       # Nested: run:chamber
       # rand_eff_chamber is a vector of random numbers, one per chamber
-      rand_eff_chamber = rand_eff_chamber[as.character(interaction(run, chamber))],
-
+      rand_eff_chamber = rand_eff_chamber[run_chamber_id],
+      
       # plant-to-plant variability
       # individual plants differ biologically even under same treatment
       # rand_eff_plant is a vector of random numbers, one per plant
