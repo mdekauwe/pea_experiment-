@@ -11,16 +11,17 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     set.seed(sample.int(1e9, 1))
   }
 
-  # derived params
+  # Convert fractional treatment effects into absolute effects
   params$effects <- list(
-    drought = params$effect_frac$drought * params$mu,
-    heat = params$effect_frac$heat * params$mu,
-    drought_heat = params$effect_frac$drought_heat * params$mu
+    drought = params$mu * params$effect_frac$drought,
+    heat = params$mu * params$effect_frac$heat,
+    drought_heat = params$mu * params$effect_frac$drought_heat
   )
 
-  # Generate all plants and store in a dataframe where each row is a unique
-  # combination of run x chamber x treatment x plant
-  plants <- expand.grid(
+  
+  # Construct the experimental setup "table", with one row per unique
+  # combination of run x chamber x plant
+  plants_df <- expand.grid(
     run = seq_len(params$n_runs),
     chamber = seq_len(params$n_chambers),
     plant = seq_len(params$n_plants),
@@ -32,7 +33,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   treat_ch2 <- rep(c("heat", "heat_drought"), length.out = params$n_plants)
   
   # Assign treatments 
-  plants <- plants %>%
+  plants_df <- plants_df %>%
     group_by(run, chamber) %>%
     mutate(
       treat = ifelse(chamber == 1, treat_ch1, treat_ch2)
@@ -40,18 +41,18 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     ungroup()
   
   # Convert treat to a factor with the correct levels
-  plants <- plants %>%
+  plants_df <- plants_df %>%
     mutate(treat = factor(treat, levels = treatments))
   
   # create a unique plant ID
-  plants <- plants %>%
+  plants_df <- plants_df %>%
     mutate(
       plant_id = sprintf("r%d_c%d_%s_p%d", run, chamber, treat, plant)
     )
   
   # Assign tray numbers to plants within each run × chamber × treatment.
   # Each tray contains 6 plants, so plants 1–6 are tray 1, 7–12 are tray 2, etc.
-  plant_grid <- plants %>%
+  plant_grid <- plants_df %>%
     arrange(run, chamber, treat, plant) %>%
     group_by(run, chamber, treat) %>%
     mutate(tray = ceiling(plant / 6)) %>%
