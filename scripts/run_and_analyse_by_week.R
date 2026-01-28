@@ -55,23 +55,25 @@ s <- simulate_experiment(params = params, treatments = treatments, seed = 124,
 plant_grid <- s$plant_grid        # full plant layout (all plants)
 experiment_df <- s$experiment_df  # measured plants across weeks
 
-#############################################
-## Fit split-plot mixed model
-#############################################
 
-# Week effects are interpreted as deviations relative to the final pre-stress 
-# week
+# Compute baseline relative Anet (average of first 2 weeks)
+baseline_weeks <- 1:2
+
 experiment_df <- experiment_df %>%
-  mutate(
-    week = factor(week, levels = 1:params$n_weeks),
-    week = relevel(week, ref = as.character(params$n_weeks - params$n_stress_weeks))
-  )
+  group_by(plant_id) %>%
+  mutate(baseline_mean = mean(Anet[week %in% baseline_weeks])) %>%
+  ungroup() %>%
+  mutate(Anet_rel = Anet - baseline_mean,
+         week = factor(week, levels = 1:params$n_weeks))  # week as factor
 
-# estimate week-specific treatment deviations relative to the reference week
-m_split_week <- lmer(Anet ~ drought * temp * week + 
+#
+## Fit split-plot mixed model (plant- and chamber-level random effects)
+
+
+m_split_week <- lmer(Anet_rel ~ drought * temp * week + 
                        (1 | run/chamber) +           # chamber-level random effect
                        (1 | run:chamber:plant_id),   # plant-level random effect
-                     data = experiment_df)
+                       data = experiment_df)
 
 # Extract fixed effects
 fixed_eff <- tidy(m_split_week, effects = "fixed")
@@ -82,7 +84,7 @@ fixed_eff %>%
   arrange(term) %>%
   print(n = Inf)
 
-# Three-way interaction
+# Three-way interaction: drought x temp x week
 fixed_eff %>%
   filter(grepl("drought:temp:week", term)) %>%
   arrange(term) %>%
