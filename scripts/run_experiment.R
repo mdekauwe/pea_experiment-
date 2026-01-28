@@ -113,7 +113,7 @@ p <- ggplot(summary_df, aes(x = week, y = mean_Anet, color = treat,
                   fill = treat), alpha = 0.2, color = NA) +
     labs(
       x = "Week",
-      y = expression(Anet~"("*mu*" mol "*m^-2*" "*s^-1*")"),
+      y = expression(A[net]~"("*mu*mol~m^-2~s^-1*")"),
       color = "Treatment",
       fill = "Treatment") +
     theme_minimal(base_size = 14) +
