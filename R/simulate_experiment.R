@@ -71,7 +71,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     mutate(tray = ceiling(plant / 6)) %>%
     ungroup()
   
-  # Randomise tray positions within each run × chamber
+  # Randomise the positions of trays within each run × chamber.
   plant_grid <- plant_grid %>%
     group_by(run, chamber) %>%
     mutate(
@@ -85,14 +85,14 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     slice_sample(n = 1) %>%           # one plant per tray
     ungroup()
   
-  # Check number of sampled plants
-  # calculate expected number based on treatments present per chamber
-  stopifnot(all(
-    measured_plants %>%
-      group_by(run, chamber, tray) %>%
-      summarise(n = n()) %>%
-      pull(n) == 1
-  ))
+  # Verify that exactly one plant has been sampled per tray
+  # For each run × chamber × tray, count the number of measured plants
+  # Stop  if any tray has more or fewer than 1 plant
+  tray_counts <- measured_plants %>%
+    group_by(run, chamber, tray) %>%
+    summarise(n_plants = n(), .groups = "drop")
+  
+  stopifnot(all(tray_counts$n_plants == 1))
 
   # Create the full experimental design, keep note of which plants 
   # we're measuring
