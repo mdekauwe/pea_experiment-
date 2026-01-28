@@ -68,15 +68,12 @@ experiment_df <- experiment_df %>%
   )
 
 # estimate week-specific treatment deviations relative to the reference week
-# tray position is fixed per pnat across weeks and treated as a random effect
 m_split_week <- lmer(Anet ~ drought * temp * week + 
-                       (1 | run/chamber) +            # chamber (whole-plot) random effect
-                       (1 | run:chamber:tray_pos) +   # tray-level random effect
-                       (1 | run:chamber:plant_id),    # plant-level random effect
+                       (1 | run/chamber) +           # chamber-level random effect
+                       (1 | run:chamber:plant_id),   # plant-level random effect
                      data = experiment_df)
-# plant-specific temporal trajectories
-# (1 + week | run:chamber:plant_id)
 
+# Extract fixed effects
 fixed_eff <- tidy(m_split_week, effects = "fixed")
 
 # Treatment × week effects
