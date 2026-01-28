@@ -24,26 +24,20 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   plants_df <- expand.grid(
     run = seq_len(params$n_runs),
     chamber = seq_len(params$n_chambers),
-    plant = seq_len(params$n_plants),
+    plant = seq_len(params$n_plants * 2),  # 36 plants per treatment × 2 treatments = 72 plants per chamber
     KEEP.OUT.ATTRS = FALSE
   )
   
-  # Define treatment assignment vectors for each chamber.
-  # Each chamber receives a repeating sequence of treatments, one  per plant in 
-  # that chamber.
-  # - Chamber 1 alternates between "control" and "drought"
-  # - Chamber 2 alternates between "heat" and "heat_drought"
-  treat_ch1 <- rep(c("control", "drought"), length.out = params$n_plants)
-  treat_ch2 <- rep(c("heat", "heat_drought"), length.out = params$n_plants)
-  
   # Assign treatments to plants based on their chamber.
-  # For each run and chamber, add a 'treat' column:
-  # - Plants in chamber 1 receive treatments from treat_ch1
-  # - Plants in chamber 2 receive treatments from treat_ch2
   plants_df <- plants_df %>%
     group_by(run, chamber) %>%
     mutate(
-      treat = ifelse(chamber == 1, treat_ch1, treat_ch2)
+      treat = case_when(
+        chamber == 1 & plant <= params$n_plants         ~ "control",
+        chamber == 1 & plant >  params$n_plants         ~ "drought",
+        chamber == 2 & plant <= params$n_plants         ~ "heat",
+        chamber == 2 & plant >  params$n_plants         ~ "heat_drought"
+      )
     ) %>%
     ungroup()
   
@@ -68,7 +62,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   plant_grid <- plants_df %>%
     arrange(run, chamber, treat, plant) %>%
     group_by(run, chamber, treat) %>%
-    mutate(tray = ceiling(plant / 6)) %>%
+    mutate(tray = ceiling(plant / 6)) %>% # calculate tray number within each treatment
     ungroup()
   
   # Randomise the positions of trays within each run × chamber.
@@ -98,7 +92,8 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   # we're measuring
   plant_grid <- plant_grid %>%
     mutate(measured = plant_id %in% measured_plants$plant_id)
-
+  
+  
   if (write_grid) {
     write.csv(plant_grid,
               file = file.path(out_dir, "full_experiment_grid.csv"),
