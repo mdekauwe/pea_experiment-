@@ -51,14 +51,14 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   
   # Assign tray numbers to plants within each run × chamber × treatment.
   # Each tray contains 6 plants, so plants 1–6 are tray 1, 7–12 are tray 2, etc.
-  plants_full <- plants %>%
+  plant_grid <- plants %>%
     arrange(run, chamber, treat, plant) %>%
     group_by(run, chamber, treat) %>%
     mutate(tray = ceiling(plant / 6)) %>%
     ungroup()
   
   # Randomise tray positions within each run × chamber
-  plants_full <- plants_full %>%
+  plant_grid <- plant_grid %>%
     group_by(run, chamber) %>%
     mutate(
       tray_pos = setNames(sample(unique(tray)), unique(tray))[as.character(tray)]
@@ -66,7 +66,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     ungroup()
   
   # Randomly select one plant per tray to be measured
-  measured_plants <- plants_full %>%
+  measured_plants <- plant_grid %>%
     group_by(run, chamber, tray) %>%  # only by tray
     slice_sample(n = 1) %>%           # one plant per tray
     ungroup()
@@ -81,11 +81,11 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   ))
 
   # Create the full design, keep note of which plants we're measuring
-  plants_full <- plants_full %>%
+  plant_grid <- plant_grid %>%
     mutate(measured = plant_id %in% measured_plants$plant_id)
 
   if (write_grid) {
-    write.csv(plants_full,
+    write.csv(plant_grid,
               file = file.path(out_dir, "full_experiment_grid.csv"),
               row.names = FALSE)
   }
@@ -200,6 +200,6 @@ simulate_experiment <- function(params, treatments, seed = NULL,
 
   return(list(
     design = design,
-    plants_full = plants_full
+    plant_grid = plant_grid
   ))
 }

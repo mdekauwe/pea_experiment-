@@ -53,7 +53,6 @@ s <- simulate_experiment(params = params, treatments = treatments, seed = 124,
                          out_dir = out_dir)
 
 design <- s$design
-plants <- s$plants_full
 
 #############################################
 ## Fit split-plot mixed model
