@@ -23,15 +23,29 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   plants <- expand.grid(
     run = seq_len(params$n_runs),
     chamber = seq_len(params$n_chambers),
-    treat = treatments,
     plant = seq_len(params$n_plants),
-    KEEP.OUT.ATTRS = FALSE # prevents metadata related to levels, as messes with mutate
-  ) 
+    KEEP.OUT.ATTRS = FALSE
+  )
   
-  # Make a readable plant ID and add to the dataframe, make treatment a factor
+  # Ccompute treatment vectors for each chamber
+  treat_ch1 <- rep(c("control", "drought"), length.out = params$n_plants)
+  treat_ch2 <- rep(c("heat", "heat_drought"), length.out = params$n_plants)
+  
+  # Assign treatments 
+  plants <- plants %>%
+    group_by(run, chamber) %>%
+    mutate(
+      treat = ifelse(chamber == 1, treat_ch1, treat_ch2)
+    ) %>%
+    ungroup()
+  
+  # Convert treat to a factor with the correct levels
+  plants <- plants %>%
+    mutate(treat = factor(treat, levels = treatments))
+  
+  # create a unique plant ID
   plants <- plants %>%
     mutate(
-      treat = factor(treat, levels = treatments),
       plant_id = sprintf("r%d_c%d_%s_p%d", run, chamber, treat, plant)
     )
 

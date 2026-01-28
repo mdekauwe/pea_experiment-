@@ -1,6 +1,6 @@
 # Pea experiment
 
-This repository contains code to simulate a split-plot experiment measuring photosynthetic rate (Anet) under drought, heat, and combined stress conditions over multiple weeks.
+This repository contains code to simulate a split-plot experiment that measured the photosynthetic rate (Anet) under drought, heat, and combined stress conditions over multiple weeks.
 
 ## Repository Structure
 
