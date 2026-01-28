@@ -48,14 +48,9 @@ out_dir <- "~/Desktop/"
 ################################################################################
 
 
-s <- simulate_experiment(
-  params = params,
-  treatments = treatments,
-  seed = 124,
-  write_grid = TRUE,
-  gradual_stress = TRUE,
-  out_dir = out_dir
-)
+s <- simulate_experiment(params = params, treatments = treatments, seed = 124, 
+                         write_grid = TRUE, gradual_stress = TRUE, 
+                         out_dir = out_dir)
 
 design <- s$design
 plants <- s$plants_full
