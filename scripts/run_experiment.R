@@ -6,7 +6,7 @@ library(dplyr)
 
 rm(list = ls())
 
-setwd("/Users/xj21307/Desktop/peas")  
+setwd("/Users/xj21307/src/R/pea_experiment")  
 source("R/simulate_experiment.R")
 
 

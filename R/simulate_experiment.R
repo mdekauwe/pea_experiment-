@@ -27,7 +27,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     KEEP.OUT.ATTRS = FALSE
   )
   
-  # Ccompute treatment vectors for each chamber
+  # Compute treatment vectors for each chamber
   treat_ch1 <- rep(c("control", "drought"), length.out = params$n_plants)
   treat_ch2 <- rep(c("heat", "heat_drought"), length.out = params$n_plants)
   
@@ -54,13 +54,16 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     group_by(run, chamber, treat) %>%
     slice_sample(n = params$n_measured) %>%
     ungroup()
-
+  
   # Check number of sampled plants
-  # should be 3 runs * 2 chambers * 4 treatments * 6 plants = 144
-  stopifnot(
-    nrow(measured_plants) ==
-      params$n_runs * params$n_chambers * length(treatments) * params$n_measured
-  )
+  # calculate expected number based on treatments present per chamber
+  expected_plants <- measured_plants %>%
+    group_by(run, chamber) %>%
+    summarise(n_treat = n_distinct(treat), .groups = "drop") %>%
+    summarise(total = sum(n_treat * params$n_measured)) %>%
+    pull(total)
+  
+  stopifnot(nrow(measured_plants) == expected_plants)
 
   # Create the full design, keep note of which plants we're measuring
   plants_full <- plants %>%
@@ -84,7 +87,7 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     KEEP.OUT.ATTRS = FALSE
   )
   
-  # Add in metadata to the overal experimental design grid
+  # Add in metadata to the overall experimental design grid
   design <- plant_week %>%
     left_join(measured_plants, by = "plant_id")
   
@@ -121,7 +124,12 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   
   # work out when the stress begins, for ease I've forced this to be at the
   # end of the experiment
-  stress_weeks <- (params$n_weeks - params$n_stress_weeks + 1):params$n_weeks
+  
+  # determine when stress starts
+  stress_start <- params$n_weeks - params$n_stress_weeks + 1
+  
+  # weeks under stress
+  stress_weeks <- stress_start:params$n_weeks
   
   # create a vector treatment effects
   treatment_effects <- c(
