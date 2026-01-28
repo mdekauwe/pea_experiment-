@@ -9,12 +9,10 @@ rm(list = ls())
 setwd("/Users/xj21307/src/R/pea_experiment")  
 source("R/simulate_experiment.R")
 
-
-
 ################################################################################
 
 #
-## Set your experiment parameters
+## Experiment parameters
 #
 
 params <- list(
@@ -52,7 +50,7 @@ s <- simulate_experiment(params = params, treatments = treatments, seed = 124,
                          write_grid = TRUE, gradual_stress = TRUE, 
                          out_dir = out_dir)
 
-plant_grid <- s$plant_grid        # full plant layout, all plants
+plant_grid <- s$plant_grid        # full plant layout (all plants)
 experiment_df <- s$experiment_df  # measured plants across weeks
 
 #############################################
@@ -111,6 +109,9 @@ summary(m_split)
 ## Plot the experiment
 ##############################################
 
+# Summarise Anet by week and treatment, compute the mean Anet across measured 
+# plants and the standard error so that we can see temporal treatment responses
+# with uncertainty
 summary_df <- experiment_df %>%
   group_by(week, treat) %>%
   summarise(mean_Anet = mean(Anet), se_Anet = sd(Anet) / sqrt(n()),
@@ -138,24 +139,3 @@ ggsave(filename = file.path(out_dir, "Anet_experiment.png"),
 
 print(p)
 
-
-#############################################
-## Power analysis
-##############################################
-
-# more than 80% is enough
-
-# Number of experimental units per factor:
-# - drought: number of plants per chamber/run
-#m_split <- extend(m_split, along = "plant_id", n = length(unique(experimental_df$plant_id)))
-#powerSim(m_split, test = fixed("drought:week", "t"), nsim = 200)
-#81%
-
-# - heat: number of chambers per run
-#chamber_means <- experimental_df %>%
-#  group_by(run, chamber, temp, week) %>%
-#  summarise(Anet = mean(Anet), .groups = "drop")
-
-#m_chamber <- lmer(Anet ~ temp * week + (1 | run), data = chamber_means)
-#powerSim(m_chamber, test = fixed("temp:week", "t"), nsim = 200)
-# 72% 
