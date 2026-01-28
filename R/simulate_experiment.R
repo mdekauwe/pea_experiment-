@@ -48,12 +48,22 @@ simulate_experiment <- function(params, treatments, seed = NULL,
     mutate(
       plant_id = sprintf("r%d_c%d_%s_p%d", run, chamber, treat, plant)
     )
-
-  # Sub-sample measured plants - N plants per run × chamber × treatment
-  measured_plants <- plants %>%
+  
+  # Assign tray numbers to plants within each run × chamber × treatment.
+  # Each tray contains 6 plants, so plants 1–6 are tray 1, 7–12 are tray 2, etc
+  plants_full <- plants %>%
+    arrange(run, chamber, treat, plant) %>%
     group_by(run, chamber, treat) %>%
-    slice_sample(n = params$n_measured) %>%
+    mutate(tray = ceiling(plant / 6)) %>%  # 6 plants per tray
     ungroup()
+  
+  # Randomly select one plant per tray to be measured.
+  # Ensures each tray contributes exactly one plant to the measured dataset.
+  measured_plants <- plants_full %>%
+    group_by(run, chamber, treat, tray) %>%
+    slice_sample(n = 1) %>%  # one plant per tray
+    ungroup()
+  
   
   # Check number of sampled plants
   # calculate expected number based on treatments present per chamber
@@ -66,13 +76,8 @@ simulate_experiment <- function(params, treatments, seed = NULL,
   stopifnot(nrow(measured_plants) == expected_plants)
 
   # Create the full design, keep note of which plants we're measuring
-  plants_full <- plants %>%
-    arrange(run, chamber, treat, plant) %>%
-    group_by(run, chamber, treat) %>%
-    mutate(tray = ceiling(plant / params$n_measured)) %>%
-    ungroup() %>%
-    mutate(measured = plant_id %in% measured_plants$plant_id) %>%
-    select(run, chamber, treat, plant, tray, plant_id, measured)
+  plants_full <- plants_full %>%
+    mutate(measured = plant_id %in% measured_plants$plant_id)
 
   if (write_grid) {
     write.csv(plants_full,
