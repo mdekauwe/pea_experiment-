@@ -65,23 +65,19 @@ plants <- s$plants_full
 #############################################
 
 # capture hierarchical structure of the split-plot experiment
+#m_split <- lmer(Anet ~ drought * temp * week +
+#                  (1 | run/chamber) + # whole-plot variability for heat, nested
+#                  (1 | run:chamber:plant_id), # sub-plot variability for drought
+#                  data = design)
+
 m_split <- lmer(Anet ~ drought * temp * week +
-                  (1 | run/chamber) + # whole-plot variability for heat, nested
-                  (1 | run:chamber:plant_id), # sub-plot variability for drought
-                  data = design)
+                  (1 | run/chamber) +          # whole-plot variability for heat
+                  (1 | run:chamber:tray) +     # tray-level variability
+                  (1 | run:chamber:plant_id),  # residual plant-level variability
+                data = design)
 
 summary(m_split)
 
-### Sudden stress
-#
-# Analysis of Anet using a split-plot linear mixed model showed that drought
-# significantly influenced the decline in Anet over time
-# (drought × week: estimate = -0.24, t = -4.13), and heat also has a significant
-# effect (temp × week: estimate = -0.37, t = -6.31). A significant three-way
-# interaction between drought, heat, and week
-# (drought × temp × week: estimate = 0.25, t = 2.98), indicated that the
-# combined impact of drought and heat on Anet over time differed from their 
-# individual effects.
 
 ### Gradual stress
 #
@@ -93,6 +89,21 @@ summary(m_split)
 # (drought × temp × week: estimate = 0.17, t = 2.08), indicated that the
 # combined impact of drought and heat on Anet over time differed from their 
 # individual effects.
+
+# Analysis of Anet using a split-plot linear mixed model, including tray as a 
+# random effect, showed that drought  had a negative influence on the 
+# decline in Anetₜ over time
+# (drought × week: estimate = -0.14, t = -1.70, p ≈ 0.09), and heat also had a 
+# negative effect (temp × week: estimate = -0.14, t = -1.70, p ≈ 0.09). 
+# The three-way interaction between drought, heat, and week 
+# (drought × temp × week: estimate = 0.008, t = 0.07, p ≈ 0.94) was not 
+# significant, indicating that the combined impact of drought and heat over 
+# time did not differ from their individual effects in this simulation. 
+# The random effects show that variability is greatest at the plant level 
+# (sigma ≈ 1.41), with moderate variability at the tray level (sigma ≈ 0.74), 
+# minimal chamber-level variability (sigma ≈ 0), and some run-to-run variation 
+# (sigma ≈ 0.53), suggesting that tray-level differences contribute modestly 
+# to the overall variation in Anet
 
 
 ##############################################
