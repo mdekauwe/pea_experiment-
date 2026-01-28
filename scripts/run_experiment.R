@@ -51,7 +51,7 @@ out_dir <- "~/Desktop/"
 s <- simulate_experiment(
   params = params,
   treatments = treatments,
-  seed = 123,
+  seed = 124,
   write_grid = TRUE,
   gradual_stress = TRUE,
   out_dir = out_dir
@@ -135,15 +135,15 @@ print(p)
 
 # Number of experimental units per factor:
 # - drought: number of plants per chamber/run
-m_split <- extend(m_split, along = "plant_id", n = length(unique(design$plant_id)))
-powerSim(m_split, test = fixed("drought:week", "t"), nsim = 200)
+#m_split <- extend(m_split, along = "plant_id", n = length(unique(design$plant_id)))
+#powerSim(m_split, test = fixed("drought:week", "t"), nsim = 200)
 #81%
 
 # - heat: number of chambers per run
-chamber_means <- design %>%
-  group_by(run, chamber, temp, week) %>%
-  summarise(Anet = mean(Anet), .groups = "drop")
+#chamber_means <- design %>%
+#  group_by(run, chamber, temp, week) %>%
+#  summarise(Anet = mean(Anet), .groups = "drop")
 
-m_chamber <- lmer(Anet ~ temp * week + (1 | run), data = chamber_means)
-powerSim(m_chamber, test = fixed("temp:week", "t"), nsim = 200)
+#m_chamber <- lmer(Anet ~ temp * week + (1 | run), data = chamber_means)
+#powerSim(m_chamber, test = fixed("temp:week", "t"), nsim = 200)
 # 72% 
