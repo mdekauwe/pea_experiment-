@@ -57,10 +57,19 @@ experiment_df <- s$experiment_df  # measured plants across weeks
 ## Fit split-plot mixed model
 #############################################
 
+# nesting:
+# ->run->chamber->plant->repeated weekly measures
+# each level has its own random intercept
+# drought is applied within chamber, to individual plants (1 | run:chamber:plant_id)
+# heat is applied to the chamber (replicated across runs; n=3), (1 | run)
+# (1|run:chamber) picks up random differences between the two chambers within a run
+
+
 # capture hierarchical structure of the split-plot experiment
 m_split <- lmer(Anet ~ drought * temp * week +
-                  (1 | run/chamber) +           # chamber random effect
-                  (1 | run:chamber:plant_id),   # plant-level random effect
+                  (1 | run) +                   # whole-plot replication for heat (heat varies only between runs)
+                  (1 | run:chamber) +           # chamber-to-chamber variation within each run 
+                  (1 | run:chamber:plant_id),   # plant-level random effect (repeated measures on plants)
                 data = experiment_df)
 
 summary(m_split)
