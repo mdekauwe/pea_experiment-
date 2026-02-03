@@ -57,7 +57,7 @@ experiment_df <- s$experiment_df  # measured plants across weeks
 ## Fit split-plot mixed model
 #############################################
 
-# nesting:
+# Experimetal nesting:
 # ->run->chamber->plant->repeated weekly measures
 # each level has its own random intercept
 # drought is applied within chamber, to individual plants (1 | run:chamber:plant_id)
@@ -73,6 +73,15 @@ m_split <- lmer(Anet ~ drought * temp * week +
                 data = experiment_df)
 
 summary(m_split)
+
+#You could fit run as a fixed effect
+
+#m_split <- lmer(Anet ~ drought * temp * week + run + # run as a fixed effect
+#                  (1 | run:chamber) +                # chamber-to-chamber variation within each run 
+#                  (1 | run:chamber:plant_id),        # plant-level random effect (repeated measures on plants)
+#                data = experiment_df)
+# This means each run gets its own intercept in the model fit
+
 
 
 ### Gradual stress
